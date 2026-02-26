@@ -7,4 +7,7 @@
         io.github.cjohansen/nexus {:git/sha "6e9bd241fd0750541104d77bfc7441d6657e4cb4"}
 
         no.cjohansen/replicant-kanban {;:git/url "https://github.com/cjohansen/replicant-kanban" :git/sha "5b03f37517717c22c7737cc03d4e616fb3a93f5f"
-        :local/root "/Users/jeroen/Projects/Github/jeroenvandijk/replicant-kanban"}}}
+                                       ;; I had to change one event handler to use data
+                                       :git/url "https://github.com/jeroenvandijk/scittle-replicant-kanban" :git/sha "2bc677d448670d845bd17d18cd4540e760bc72c5"
+                                       ;:local/root "/Users/jeroen/Projects/Github/jeroenvandijk/replicant-kanban"
+                                       }}}
