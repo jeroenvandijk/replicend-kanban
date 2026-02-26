@@ -21,7 +21,6 @@
          (->> sample-data/tasks
               (map (juxt :task/id identity))
               (into {}))
-
          :system/started-at (java.util.Date.)
          :columns sample-data/columns
          :tags sample-data/tags}))
@@ -29,6 +28,7 @@
 
 (defn get-aliases []
   (-> (replicant.alias/get-registered-aliases) 
+      ;; REVIEW I had an issue with missing namespaces, but maybe it is not necessary anymore
       (merge (update-keys (replicant.alias/get-registered-aliases) 
                           (fn [k] (keyword "kanban.ui.elements" (name k)))) )))
 
@@ -37,6 +37,7 @@
   [:div#app (ui/render-app data)])
 
 (defn asset-path [path]
+  ;; Add CACHE buster so we don't have stale files accidentally
   (str path "?" (.getTime (java.util.Date.))))
 
 (defn javascript-include-tag [path]
@@ -68,7 +69,6 @@
    [:head
     (scittle-libs)
    
-
     ;; From libs
     (scittle-include-tag "reagami/core.cljc")
 
@@ -85,8 +85,6 @@
 
     ;; Bridge between frontend and backend Nexus
     (scittle-include-tag "frontend/replicend.cljs")
-
-
 
     (scittle-block '(replicend/start-stream))
 

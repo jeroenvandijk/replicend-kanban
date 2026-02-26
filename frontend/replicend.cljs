@@ -5,9 +5,11 @@
    [nexus.strategies :as strategies]
    [clojure.string :as str]))
 
+
 (nxr/register-action! :actions/command 
   (fn [_ wrapped-command]
     [[:effects/command wrapped-command]]))
+
 
 (nxr/register-effect! :effects/command
                       ^:nexus/batch
@@ -44,10 +46,11 @@
      ctx))
 
 
-
-(def store (atom {}))
-
 (nxr/register-interceptor! strategies/fail-fast)
+
+
+;; We don't store anything locally (yet), but nxr/dispatch expects an atom
+(def store (atom {}))
 
 
 (defn dispatch-actions [dispatch-data actions]
@@ -117,11 +120,11 @@
 
 
 (defn start-stream []
-  (let [host-alias (str "http://"  (js/Date.now) "-" js/document.location.host )
+  (let [host-alias (str "http://"  (js/Date.now) "-" js/document.location.host)
+        
         event-stream (fn event-stream []
-                       #_(js/console.log "request at " (js/Date.now))
-                     
-                       (-> (js/fetch      ;host-alias #_
+                       #_(js/console.log "request at " (js/Date.now))                     
+                       (-> (js/fetch
                             "/" 
                             (clj->js {:headers {"Accept" "text/event-stream"
                                                 "x-forwarded-for" js/document.location.host}}))
@@ -132,38 +135,37 @@
                                           readChunk (fn readChunk []
                                                       (-> (.read reader)
                                                           (.then (fn [x]
-                                                                   ;(js/console.log "chunk" x)
                                                                    (let [{:keys [value done] :as y} (js->clj x {:keywordize-keys true})]
                                                         
                                                                      (if done 
                                                                        (js/console.log "Stream finished")
                                                                        (do
                                                                          (when value 
-                                                                           (let [chunkString (.decode #?(:squint (TextDecoder.) :scittle (js/TextDecoder.)) value)
+                                                                           (let [chunkString (.decode (js/TextDecoder.) value)
                                                                                  body-data-str (subs chunkString 6)]
                                                                              (render body-data-str)))
                                                             
                                                                          (readChunk))))))
                                                           (.catch (fn [error]
-                                                                    (js/console.log "Error  in Read chunk... " (js/Date.now))
-                                                       
-                                                       
-                                                                    ;; When connection drops entirely, e.g. on server reset
+                                                                    (js/console.log "Error in Read chunk... " (js/Date.now))
                                                                     (js/console.error error)
 
+                                                                    ;; When connection drops entirely, e.g. on server reset
                                                                     (js/console.log "Trying to reconnect" (js/Date.now))
                                                                     (js/setTimeout event-stream 50)
                                                                     ))
                                                           ))]
                                       (readChunk))))
                            (.catch (fn [error]
-
-                        
                                      (js/console.log "Error in stream ... ")
                                      (js/console.error error)
-
-                                     (js/setTimeout event-stream 50)))))]
+                                     
+                                     ;; Try to reconnect
+                                     (js/console.log "Trying to reconnect" (js/Date.now))
+                                     (js/setTimeout event-stream 50)))))
+]
     (event-stream)))
+
 
 (js/console.log "%cReplicend%c loaded", "font-weight: bold", "font-weight: normal")
 
