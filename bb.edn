@@ -1,0 +1,10 @@
+{:paths ["."]
+ :deps {io.github.borkdude/reagami {:git/sha "7e23c82c37726f9e749a28cf94677b5631df589d"}
+   
+        no.cjohansen/replicant {:mvn/version "2025.12.1"}
+
+        ;; Use Git dep so we can use io/resource for source files easily
+        io.github.cjohansen/nexus {:git/sha "6e9bd241fd0750541104d77bfc7441d6657e4cb4"}
+
+        no.cjohansen/replicant-kanban {;:git/url "https://github.com/cjohansen/replicant-kanban" :git/sha "5b03f37517717c22c7737cc03d4e616fb3a93f5f"
+        :local/root "/Users/jeroen/Projects/Github/jeroenvandijk/replicant-kanban"}}}
